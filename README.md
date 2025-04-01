@@ -8,7 +8,7 @@
 ---
 
 ## Características
-- **Interfaz gráfica intuitiva**: Carga, visualiza y recorta círculos de interés en imágenes con una interfaz basada en Tkinter.
+- **Interfaz gráfica intuitiva**: Carga y recorta círculos de interés en imágenes con una interfaz basada en Tkinter.
 - **Selección de ROI**: Permite definir regiones de interés desplazables con el ratón para un recorte personalizado.
 - **Detección automática**: Identifica los centroides en imágenes mediante técnicas de procesamiento como CLAHE, filtrado bilateral y análisis de contornos.
 - **Análisis de centroides**: Compara centroides teóricos y experimentales para evaluar desviaciones.
