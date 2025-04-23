@@ -12,18 +12,20 @@ import json
 import csv
 
 def classify_centroids(centers, x_center, y_center, r):
+    
     """
-    Clasifica los centroides en dos listas: dentro o fuera de un círculo de radio r.
+    Classify centroids into two lists: inside or outside a circle with radius r.
 
-    Parámetros:
-    - centers: Lista de diccionarios con coordenadas {'x': val, 'y': val}
-    - x_center, y_center: Coordenadas del centro del círculo
-    - r: Radio del círculo
+    Parameters:
+    - centers: List of dictionaries with coordinates {'x': val, 'y': val}
+    - x_center, y_center: Coordinates of the circle's center
+    - r: Radius of the circle
 
-    Retorna:
-    - inside_centroids: Lista de centroides dentro del círculo
-    - outside_centroids: Lista de centroides fuera del círculo
+    Returns:
+    - inside_centroids: List of centroids inside the circle
+    - outside_centroids: List of centroids outside the circle
     """
+    
     inside_centroids = []
     outside_centroids = []
 
@@ -41,23 +43,26 @@ def classify_centroids(centers, x_center, y_center, r):
     return inside_centroids, outside_centroids
 
 def match_points(experimental_points, theoretical_points):
+    
     """
-    Empareja cada punto experimental con el punto teórico más cercano.
+    Match each experimental point with the nearest theoretical point.
 
-    Parámetros:
-    - experimental_points: Lista de puntos experimentales [{'x': x, 'y': y, ...}]
-    - theoretical_points: Lista de puntos teóricos [{'x': x, 'y': y, ...}]
+    Parameters:
+    - experimental_points: List of experimental points [{'x': x, 'y': y, ...}]
+    - theoretical_points: List of theoretical points [{'x': x, 'y': y, ...}]
 
-    Retorna:
-    - matched_pairs: Lista de tuplas [(exp_point, theo_point), ...]
+    Returns:
+    - matched_pairs: List of tuples [(exp_point, theo_point), ...]
     """
+
     matched_pairs = []
 
     for exp_point in experimental_points:
         min_distance = float('inf')
         closest_theo_point = None
 
-        # Encontrar el punto teórico más cercano
+        # Find the nearest theoretical point
+        
         for theo_point in theoretical_points:
             distance = np.sqrt((theo_point['x'] - exp_point['x']) ** 2 + (theo_point['y'] - exp_point['y']) ** 2)
             if distance < min_distance:
@@ -70,15 +75,17 @@ def match_points(experimental_points, theoretical_points):
 
 
 def compute_errors(matched_pairs):
+    
     """
-    Calcula las diferencias entre puntos experimentales y teóricos.
+    Calculate the differences between experimental and theoretical points.
 
-    Parámetros:
-    - matched_pairs: Lista de tuplas [(exp_point, theo_point), ...]
+    Parameters:
+    - matched_pairs: List of tuples [(exp_point, theo_point), ...]
 
-    Retorna:
-    - errors: Lista de diccionarios con errores [{'error_x': ..., 'error_y': ..., 'error_dist': ...}]
+    Returns:
+    - errors: List of dictionaries with errors [{'error_x': ..., 'error_y': ..., 'error_dist': ...}]
     """
+
     errors = []
 
     for exp_point, theo_point in matched_pairs:
@@ -96,88 +103,88 @@ def compute_errors(matched_pairs):
 
 
 
-def save_to_csv(matched_pairs, errors, filename="resultados.csv"):
+def save_to_csv(matched_pairs, errors, filename="results.csv"):
+    
     """
-    Guarda los puntos emparejados y los errores en un archivo CSV.
+    Save the matched points and errors to a CSV file.
 
-    Parámetros:
-    - matched_pairs: Lista de tuplas [(exp_point, theo_point), ...]
-    - errors: Lista de diccionarios con errores [{'error_x': ..., 'error_y': ..., 'error_dist': ...}]
-    - filename: Nombre del archivo CSV (por defecto: "resultados.csv")
+    Parameters:
+    - matched_pairs: List of tuples [(exp_point, theo_point), ...]
+    - errors: List of dictionaries with errors [{'error_x': ..., 'error_y': ..., 'error_dist': ...}]
+    - filename: Name of the CSV file (default: "results.csv")
     """
-    # Abrir el archivo CSV en modo escritura
+
+    # Open file CSV 
     with open(filename, mode='w', newline='') as file:
         writer = csv.writer(file)
         
-        # Escribir el encabezado del CSV
+        # Write the CSV header
         writer.writerow([
             "Experimental X", "Experimental Y",
-            "Teórico X", "Teórico Y",
-            "Error X", "Error Y", "Error Distancia"
+            "Theoretical X", "Theoretical Y",
+            "Error X", "Error Y", "Error Distance"
         ])
         
-        # Escribir los datos
+        # Write the data
         for (exp_point, theo_point), error in zip(matched_pairs, errors):
             writer.writerow([
                 exp_point['x'], exp_point['y'],
                 theo_point['x'], theo_point['y'],
                 error['error_x'], error['error_y'],f"{ error['error_dist']:.2f}"
             ])
-    print(f"Los resultados se han guardado en '{filename}'.")
+    print(f"The results have been saved in '{filename}'.")
 
-# === CARGA DE DATOS JSON ===
+# === Load data JSON ===
 with open('resultados7.json', 'r') as f:
-    data = json.load(f)
+    data = json.load(f)
 
 centers = data['centros_kmeans']
-tamano_imagen = data['tamano_imagen']
-centro_imagen = data['centro_imagen']
+image_size = data['tamano_imagen']
+image_center = data['centro_imagen']
 
-size = tamano_imagen['alto']  
-x_center = centro_imagen['cx']  
-y_center = centro_imagen['cy']  
-r = 206 -10
+size = image_size['alto']  
+x_center = image_center['cx']  
+y_center = image_center['cy']  
+r = 206 - 10
 
-# Clasificar puntos experimentales dentro y fuera del círculo
-inside_experiment, outside_experiment = classify_centroids(centers, x_center, y_center, r)    
+# Classify experimental points inside and outside the circle
+inside_experiment, outside_experiment = classify_centroids(centers, x_center, y_center, r)    
 
-        
+        
 # Create blank image
-imagen = np.zeros((size, size), dtype=np.uint8)
+image = np.zeros((size, size), dtype=np.uint8)
 circle_mask = np.zeros((size, size), dtype=np.uint8)
-cv2.circle(circle_mask, (x_center, y_center), r, 255, -1)  # Main circle mask
+cv2.circle(circle_mask, (x_center, y_center), r, 255, -1)  # Main circle mask
 # Set radius for smaller circles (adjusted for new image size)
-radius = 8  # Adjust this value as needed
+radius = 8  # Adjust this value as needed
 
 # Draw circles from JSON centers
 for center in centers:
-    x, y = center['x'], center['y']
-    # Dibujar un pequeño circuloen cada punto
-    cv2.circle(imagen, (x, y), radius, 255, -1)
+    x, y = center['x'], center['y']
+    # Draw a small circle at each point
+    cv2.circle(image, (x, y), radius, 255, -1)
 
 
-inside = cv2.bitwise_and(imagen, circle_mask)  # Intersección
+inside = cv2.bitwise_and(image, circle_mask)  # Intersection
 
-cv2.circle(imagen, (x_center, y_center), r, 255, 2)
-cv2.circle(inside, (x_center, y_center), r, 255, 2)  # contornos circulo en inside 
+cv2.circle(image, (x_center, y_center), r, 255, 2)
+cv2.circle(inside, (x_center, y_center), r, 255, 2)  # Circle contours in inside 
 
 
-# === GENERACIÓN DE CÍRCULOS TEÓRICOS ===
-#N = 7
-#N = 5 
-#N = 14
+# === GENERATION OF THEORETICAL CIRCLES ===
 N = 12
 grid_size = size // N
-radius = 8  
-centros_teoricos = []
-# Crear una imagen en blanco
+radius = 8  
+theoretical_centers = []
+# Create a blank image
 image = np.zeros((size, size), dtype=np.uint8)
+
 
 for i in range(N):
     for j in range(N):
         x = int((i + 0.5) * grid_size)
         y = int((j + 0.5) * grid_size)
-        centros_teoricos.append({'x': x, 'y': y})
+        theoretical_centers.append({'x': x, 'y': y})
         for dy in range(-radius, radius+1):
             for dx in range(-radius, radius+1):
                 if dx**2 + dy**2 <= radius**2:
@@ -185,94 +192,90 @@ for i in range(N):
                     if 0 <= xi < size and 0 <= yi < size:
                         image[yi, xi] = 255
 
-inside_theoretical, outside_theoretical = classify_centroids(centros_teoricos, x_center, y_center, r)
+inside_theoretical, outside_theoretical = classify_centroids(theoretical_centers, x_center, y_center, r)
 
-######----------------------------------------------
-circulo = image.copy()
-cv2.circle(circulo, (x_center, y_center), r, 255, 2)
-#####-------------------------------------------------
-inside_circles = cv2.bitwise_and(image, circle_mask)  # Intersección
+
+circles = cv2.bitwise_and(image, circle_mask)  # Intersection
 cv2.circle(inside_circles, (x_center, y_center), r, 255, 2)
 
 
 plt.figure(figsize=(10, 5))
 plt.subplot(1, 2, 1)
 plt.imshow(inside, cmap="gray")
-plt.title("Centroides experimentales")
+plt.title("Experimental Centroids")
 plt.axis('off')
 
 plt.subplot(1, 2, 2)
-plt.imshow(inside_circles, cmap = "gray")
-plt.title("Centroides teóricos")
+plt.imshow(inside_circles, cmap="gray")
+plt.title("Theoretical Centroids")
 plt.axis('off')
 
 plt.show()
 
 
 
-# === CÁLCULO DE ERRORES ===
+# === ERROR CALCULATION ===
 matched_pairs = match_points(inside_experiment, inside_theoretical)
 errors = compute_errors(matched_pairs)
-# === Guardar resultados en CSV ===
-save_to_csv(matched_pairs, errors, filename="resultados.csv") 
-# Calcular el promedio de las distancias
-total_distance = sum(error['error_dist'] for error in errors)  # Suma de todas las distancias
-avg = total_distance / len(errors)  # Promedio
+# === Save results to CSV ===
+save_to_csv(matched_pairs, errors, filename="results.csv") 
+# Calculate the average distance
+total_distance = sum(error['error_dist'] for error in errors)  # Sum of all distances
+avg = total_distance / len(errors)  # Average
 
-# === IMPRIMIR RESULTADOS ===
-print("\n###########------ Comparación Teórico vs. Experimental ------##############")
+# === PRINT RESULTS ===
+print("\n###########------ Theoretical vs. Experimental Comparison ------##############")
 for i, ((exp, theo), err) in enumerate(zip(matched_pairs, errors)):
-    print(f"Punto {i+1}:")
-    print(f"Teórico:       ({theo['x']}, {theo['y']})")
-    print(f"Experimental:  ({exp['x']}, {exp['y']})")
-    print(f"Error: Δx={err['error_x']:.2f}, Δy={err['error_y']:.2f}, Dist={err['error_dist']:.2f}")
-    print("-" * 60)
+    print(f"Point {i+1}:")
+    print(f"Theoretical:       ({theo['x']}, {theo['y']})")
+    print(f"Experimental:  ({exp['x']}, {exp['y']})")
+    print(f"Error: Δx={err['error_x']:.2f}, Δy={err['error_y']:.2f}, Dist={err['error_dist']:.2f}")
+    print("-" * 60)
 
-# === VISUALIZACIÓN ===
-imagen = np.zeros((size, size), dtype=np.uint8)
+# === VISUALIZATION ===
+image = np.zeros((size, size), dtype=np.uint8)
 for center in inside_theoretical:
-    cv2.circle(imagen, (center['x'], center['y']), radius, 255, -1)
+    cv2.circle(image, (center['x'], center['y']), radius, 255, -1)
 
-cv2.circle(imagen, (x_center, y_center), r, 255, 2)  
+cv2.circle(image, (x_center, y_center), r, 255, 2)  
 
-# Crear una figura
+# Create a figure
 plt.figure(figsize=(8, 8))
-plt.imshow(imagen, cmap="gray")
-# Graficar puntos experimentales
+plt.imshow(image, cmap="gray")
+# Plot experimental points
 plt.scatter(
-    [p['x'] for p in inside_experiment],
-    [p['y'] for p in inside_experiment],
-    color='red', label='Experimental', marker='o'
+    [p['x'] for p in inside_experiment],
+    [p['y'] for p in inside_experiment],
+    color='red', label='Experimental', marker='o'
 )
 
-# Graficar puntos teóricos
+# Plot theoretical points
 plt.scatter(
-    [p['x'] for p in inside_theoretical],
-    [p['y'] for p in inside_theoretical],
-    color='blue', label='Teórico', marker='x'
+    [p['x'] for p in inside_theoretical],
+    [p['y'] for p in inside_theoretical],
+    color='blue', label='Theoretical', marker='x'
 )
 
-# Dibujar líneas que conecten los puntos emparejados (para mostrar errores)
+# Draw lines connecting matched points (to show errors)
 for exp_point, theo_point in matched_pairs:
-    plt.plot(
-        [exp_point['x'], theo_point['x']],
-        [exp_point['y'], theo_point['y']],
-        color='yellow', linestyle='--', linewidth=0.8
-    )
+    plt.plot(
+        [exp_point['x'], theo_point['x']],
+        [exp_point['y'], theo_point['y']],
+        color='yellow', linestyle='--', linewidth=0.8
+    )
 
-# Agregar etiquetas a los puntos
+# Add labels to points
 for i, (exp_point, theo_point) in enumerate(matched_pairs):
-    plt.text(exp_point['x'], exp_point['y'], f"{i+1}", color='white', fontsize=9, ha='right', va='bottom')
-    plt.text(theo_point['x'], theo_point['y'], f"{i+1}", color='white', fontsize=9, ha='left', va='top')
+    plt.text(exp_point['x'], exp_point['y'], f"{i+1}", color='white', fontsize=9, ha='right', va='bottom')
+    plt.text(theo_point['x'], theo_point['y'], f"{i+1}", color='white', fontsize=9, ha='left', va='top')
 
-# Configuración del gráfico
-plt.title("Comparación de Centroides Experimentales vs. Teóricos")
+# Graph configuration
+plt.title("Comparison of Experimental vs. Theoretical Centroids")
 
 plt.legend()
 plt.grid(True, linestyle='--', alpha=0.7)
 plt.axis('off')
-#plt.gca().set_aspect('equal', adjustable='box')  # Escala igual en X e Y
+#plt.gca().set_aspect('equal', adjustable='box')  # Equal scale in X and Y
 
-# Mostrar el gráfico
+# Show the graph
 plt.show()
-
