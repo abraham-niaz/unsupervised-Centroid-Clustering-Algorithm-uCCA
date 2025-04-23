@@ -1,24 +1,23 @@
 # UnsupervicedNNBiRonHart-CuNN
 
-**UnsupervicedNNBiRonHart-CuNN** es un proyecto que combina técnicas de procesamiento de imágenes y análisis de centroides para estudiar patrones circulares en imágenes de manera semi supervisada. El proyecto consta de dos componentes principales:
+**UnsupervicedNNBiRonHart-CuNN**  is a project that combines image processing techniques and centroid analysis to study circular patterns in images in a semi-supervised manner. The project consists of two main components:
 
-1. **Processing**: Una interfaz gráfica (GUI) desarrollada en Python que permite a los usuarios cargar imágenes, seleccionar regiones de interés (ROI) y recortar círculos automáticamente detectados en dichas imágenes. Posteriormente obtener los centroides de la región de interés.
-2. **Circles**: Un algoritmo que calcula la diferencia entre los centroides teóricos (esperados) y los centroides experimentales (obtenidos de los círculos detectados).
+1. **Processing**: A graphical user interface (GUI) developed in Python that allows users to load images, select regions of interest (ROI), and automatically crop circles detected in those images. Subsequently, it obtains the centroids of the region of interest.
+2. **Circles**: An algorithm that calculates the difference between theoretical (expected) centroids and experimental centroids (obtained from the detected circles).
+---
+
+## Features
+- **Intuitive graphical interface**: Load and crop circles of interest in images with a Tkinter-based interface.
+- **ROI selection**: Allows defining movable regions of interest with the mouse for custom cropping.
+- **Automatic detection**: Identifies centroids in images using processing techniques such as CLAHE, bilateral filtering, and contour analysis.
+- **Centroid analysis**: Compares theoretical and experimental centroids to evaluate deviations.
+- **Flexible saving**: Exports cropped images and results in formats like JPG and JSON.
 
 ---
 
-## Características
-- **Interfaz gráfica intuitiva**: Carga y recorta círculos de interés en imágenes con una interfaz basada en Tkinter.
-- **Selección de ROI**: Permite definir regiones de interés desplazables con el ratón para un recorte personalizado.
-- **Detección automática**: Identifica los centroides en imágenes mediante técnicas de procesamiento como CLAHE, filtrado bilateral y análisis de contornos.
-- **Análisis de centroides**: Compara centroides teóricos y experimentales para evaluar desviaciones.
-- **Guardado flexible**: Exporta imágenes recortadas y resultados en formatos como JPG y JSON.
-
----
-
-## Requisitos
+## Requeriments
 - Python 3.12
-- Bibliotecas:
+- Libraries:
   - `opencv-python` 
   - `tkinter`
   - `Pillow` 
