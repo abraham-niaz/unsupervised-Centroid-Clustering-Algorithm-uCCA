@@ -10,193 +10,199 @@ import numpy as np
 import os
 
 
-def analizar_contornos(image, contours, area_min=70000, area_max=400000, debug=False):
+def analizar_contornos(image, contours, area_min=70000, area_max=400000, debug=False): 
     """
-    Analiza y filtra contornos según su área, dibujándolos con información adicional.
-    
-    Parametros:
-    - image: Imagen de entrada en escala de grises
-    - contours: Lista de contornos obtenidos de cv2.findContours
-    - area_min: Área mínima para filtrar contornos (default: 70000)
-    - area_max: Área máxima para filtrar contornos (default: 400000)
-    - debug: Si es True, retorna información adicional para depuración
-    
-    Returns:
-    - imagen_areas: Imagen con contornos numerados y centroides
-    - imagen_filtrada: Imagen con contornos filtrados coloreados
-    - dict: (opcional) Información adicional si debug=True
-    """
-    # Calcular y ordenar áreas de todos los contornos
-    areas_contornos = [cv2.contourArea(contour) for contour in contours]
-    areas_contornos.sort(reverse=True)
-    
-    # Crear copias de la imagen para visualización
-    imagen_areas = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-    imagen_filtrada = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-    
-    # Listas para almacenar resultados
-    areas_filtradas = []
-    centroides = []
-    
-    # Procesar cada contorno
-    for i, contour in enumerate(contours):
-        area = cv2.contourArea(contour)
-        
-        # Filtrar por área mínima y máxima
-        if area_min <= area <= area_max:
-            areas_filtradas.append((i + 1, area))
-            
-            # Generar color aleatorio
-            color = tuple(np.random.randint(0, 255, 3).tolist())
-            
-            # Dibujar contorno filtrado
-            cv2.drawContours(imagen_filtrada, [contour], -1, color, thickness=5)
-            
-            # Calcular centroide
-            M = cv2.moments(contour)
-            if M["m00"] != 0:
-                cx = int(M["m10"] / M["m00"])
-                cy = int(M["m01"] / M["m00"])
-                centroides.append([cx, cy])
-                
-                # Dibujar número y centroide en imagen_areas
-                cv2.putText(imagen_areas, f"{i+1}", (cx, cy), 
-                          cv2.FONT_HERSHEY_SIMPLEX, 4, (0, 255, 0), 3)
-                cv2.circle(imagen_areas, (cx, cy), 15, (255, 255, 255), -1)
-    
-    # Imprimir información
-    print("Áreas ordenadas de mayor a menor:", areas_contornos)
-    print(f"Área mínima: {area_min}")
-    print(f"Área máxima: {area_max}")
-    print("Contornos Filtrados por Área")
-    for num, area in areas_filtradas:
-        print(f"Contorno {num}, Área = {area:.2f}")
-    
-    if debug:
-        debug_info = {
-            'areas_totales': areas_contornos,
-            'areas_filtradas': areas_filtradas,
-            'centroides': centroides
-        }
-        return imagen_areas, imagen_filtrada, debug_info
-    
-    return imagen_areas, imagen_filtrada, centroides
+    Analyzes and filters contours based on their area, drawing them with additional information.
+    
+    Parameters:
+    - image: Input grayscale image
+    - contours: List of contours obtained from cv2.findContours
+    - area_min: Minimum area to filter contours (default: 70000)
+    - area_max: Maximum area to filter contours (default: 400000)
+    - debug: If True, returns additional debugging information
+    
+    Returns:
+    - image_areas: Image with numbered contours and centroids
+    - filtered_image: Image with filtered contours colored
+    - dict: (optional) Additional information if debug=True
 
-def filtrar_y_recortar_circulos(image, contours, centroides, carpeta_salida, tolerance=0.20, circularity_min=0.75, 
-                               circularity_max=1.1, expansion_factor=0.15):
-    """
-    Filtra contornos aproximadamente circulares, calcula círculos promedio y recorta regiones de interés.
-
-    Parameters:
-    - image: Imagen de entrada en formato BGR.
-    - contours: Lista de contornos obtenidos con cv2.findContours.
-    - centroides: Lista de coordenadas [cx, cy] de los centroides de los contornos.
-    - carpeta_salida: Directorio donde se guardarán las imágenes recortadas.
-    - tolerance: Porcentaje de tolerancia para el rango de área (default: 0.20).
-    - circularity_min: Umbral mínimo de circularidad (default: 0.75).
-    - circularity_max: Umbral máximo de circularidad (default: 1.1).
-    - expansion_factor: Factor para expandir el recorte más allá del radio (default: 0.15).
-
-    Returns:
-    - imagep: Imagen original con rectángulos dibujados alrededor de las regiones recortadas.
-    - circulos: Imagen con los círculos promedio dibujados.
-    - cropped_images: Lista de imágenes recortadas.
-    - mask: Máscara con los círculos mínimos que encierran los contornos filtrados.
     """
     
-    # Convertir a escala de grises si no lo está
-    if len(image.shape) == 3:
-        imagen_gris = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    else:
-        imagen_gris = image
+    # Calculate and sort areas of all contours
+    contour_areas = [cv2.contourArea(contour) for contour in contours]
+    contour_areas.sort(reverse=True)
 
-    # Calcular el área máxima de los contornos
-    if not contours:
-        print("No se encontraron contornos.")
-        return image, np.zeros_like(imagen_gris), [], np.zeros_like(imagen_gris)
-    max_area = max(cv2.contourArea(contour) for contour in contours)
-    print("Máxima área:", max_area)
+    # Create copies of the image for visualization
+    image_areas = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+    filtered_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 
-    # Definir el rango de tolerancia (20% del área máxima por defecto)
-    min_area = max_area * (1 - tolerance)
-    max_area_tolerance = max_area * (1 + tolerance)
-    print("Área mínima:", min_area)
-    print("Área máxima con tolerancia:", max_area_tolerance)
+    # Lists to store results
+    filtered_areas = []
+    centroids = []
 
-    # Crear una máscara en negro
-    mask = np.zeros_like(imagen_gris)
+    
+    # Process each contour
+    for i, contour in enumerate(contours):
+        area = cv2.contourArea(contour)
+        
+        # Filter by minimum and maximum area
+        if area_min <= area <= area_max:
+            filtered_areas.append((i + 1, area))
+            
+            # Generate random color
+            color = tuple(np.random.randint(0, 255, 3).tolist())
 
-    # Filtrar contornos y calcular radios
+            # Draw filtered contour
+            cv2.drawContours(filtered_image, [contour], -1, color, thickness=5)
+            
+            # Calculate centroid
+            M = cv2.moments(contour)
+            if M["m00"] != 0:
+                cx = int(M["m10"] / M["m00"])
+                cy = int(M["m01"] / M["m00"])
+                centroids.append([cx, cy])
+                
+                # Draw number and centroid on image_areas
+                cv2.putText(image_areas, f"{i+1}", (cx, cy), 
+                          cv2.FONT_HERSHEY_SIMPLEX, 4, (0, 255, 0), 3)
+                cv2.circle(image_areas, (cx, cy), 15, (255, 255, 255), -1)
+
+    # Print information
+    print("Areas sorted from largest to smallest:", contour_areas)
+    print(f"Minimum area: {area_min}")
+    print(f"Maximum area: {area_max}")
+    print("Contours Filtered by Area")
+    for num, area in filtered_areas:
+        print(f"Contour {num}, Area = {area:.2f}")
+    
+    if debug:
+        debug_info = {
+            'total_areas': contour_areas,
+            'filtered_areas': filtered_areas,
+            'centroids': centroids
+        }
+        return image_areas, filtered_image, debug_info
+    
+    return image_areas, filtered_image, centroids
+
+
+def filtrar_y_recortar_circulos(image, contours, centroids, output_folder, tolerance=0.20, circularity_min=0.75, 
+                            circularity_max=1.1, expansion_factor=0.15):
+    """
+    Filters approximately circular contours, calculates average circles, and crops regions of interest.
+
+    Parameters:
+    - image: Input image in BGR format.
+    - contours: List of contours obtained with cv2.findContours.
+    - centroids: List of [cx, cy] coordinates of the contour centroids.
+    - output_folder: Directory where the cropped images will be saved.
+    - tolerance: Percentage tolerance for the area range (default: 0.20).
+    - circularity_min: Minimum circularity threshold (default: 0.75).
+    - circularity_max: Maximum circularity threshold (default: 1.1).
+    - expansion_factor: Factor to expand the crop beyond the radius (default: 0.15).
+
+    Returns:
+    - imagep: Original image with rectangles drawn around the cropped regions.
+    - circles: Image with the average circles drawn.
+    - cropped_images: List of cropped images.
+    - mask: Mask with the minimum circles enclosing the filtered contours.
+
+    """
+
+    # Convert to grayscale if not already
+    if len(image.shape) == 3:
+        gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    else:
+        gray_image = image
+
+    # Calculate the maximum area of the contours
+    if not contours:
+        print("No contours found.")
+        return image, np.zeros_like(gray_image), [], np.zeros_like(gray_image)
+    max_area = max(cv2.contourArea(contour) for contour in contours)
+    print("Maximum area:", max_area)
+
+    # Define the tolerance range (default 20% of the maximum area)
+    min_area = max_area * (1 - tolerance)
+    max_area_tolerance = max_area * (1 + tolerance)
+    print("Minimum area:", min_area)
+    print("Maximum area with tolerance:", max_area_tolerance)
+
+    # Create a black mask
+    mask = np.zeros_like(gray_image)
+
+    # Filter contours and calculate radii
     filtered_contours = []
-    radii = []  # Lista para almacenar los radios de los círculos
+    radii = []  # List to store the radii of the circles
 
     for contour in contours:
-        area_contour = cv2.contourArea(contour)
-        
-        # Filtrar por área dentro del rango de tolerancia
-        if min_area <= area_contour <= max_area_tolerance:
-            # Obtener el círculo mínimo que encierra el contorno
+        contour_area = cv2.contourArea(contour)
+    
+        # Filter by area within the tolerance range
+        if min_area <= contour_area <= max_area_tolerance:
+            # Get the minimum enclosing circle for the contour
             (x, y), radius = cv2.minEnclosingCircle(contour)
-            area_circle = np.pi * (radius ** 2)
-            
-            # Verificar si la forma es aproximadamente circular
-            circularity = area_contour / area_circle  # Debe estar cerca de 1 para un círculo
-            
+            circle_area = np.pi * (radius ** 2)
+        
+            # Check if the shape is approximately circular
+            circularity = contour_area / circle_area  # Should be close to 1 for a circle
+        
             if circularity_min <= circularity <= circularity_max:
                 filtered_contours.append(contour)
                 radii.append(radius)
                 cv2.circle(mask, (int(x), int(y)), int(radius), (255), thickness=3)
 
-    # Calcular el radio promedio
-    radio_promedio = int(np.mean(radii)) if radii else 0
-    print("Radio promedio:", radio_promedio)
+    # Calculate the average radius
+    average_radius = int(np.mean(radii)) if radii else 0
+    print("Average radius:", average_radius)
 
-    # Dibujar círculos promedio en los centroides
-    circulos = np.zeros_like(imagen_gris)
-    for cx, cy in centroides:
-        cv2.circle(circulos, (cx, cy), radio_promedio, (255, 0, 0), thickness=3)  # Azul para los círculos promedio
+    # Draw average circles at the centroids
+    circles = np.zeros_like(gray_image)
+    for cx, cy in centroids:
+        cv2.circle(circles, (cx, cy), average_radius, (255, 0, 0), thickness=3)  # Blue for average circles
 
-    # Lista para almacenar las imágenes recortadas
+    # List to store the cropped images
     cropped_images = []
-    imagep = image.copy()  # Copia de la imagen original para dibujar rectángulos
-    expansion = int(radio_promedio * expansion_factor)  # Margen adicional para el recorte
+    imagep = image.copy()  # Copy of the original image to draw rectangles
+    expansion = int(average_radius * expansion_factor)  # Additional margin for cropping
 
-    # Recortar cada círculo promedio
-    for i, (cx, cy) in enumerate(centroides):
-        # Definir los límites del recorte
-        x_min = max(0, cx - radio_promedio - expansion)
-        x_max = min(imagep.shape[1], cx + radio_promedio + expansion)
-        y_min = max(0, cy - radio_promedio - expansion)
-        y_max = min(imagep.shape[0], cy + radio_promedio + expansion)
+    # Crop each average circle
+    for i, (cx, cy) in enumerate(centroids):
+        # Define the crop boundaries
+        x_min = max(0, cx - average_radius - expansion)
+        x_max = min(imagep.shape[1], cx + average_radius + expansion)
+        y_min = max(0, cy - average_radius - expansion)
+        y_max = min(imagep.shape[0], cy + average_radius + expansion)
 
-        # Recortar la región de la imagen
+        # Crop the region of the image
         cropped = image[y_min:y_max, x_min:x_max]
         cropped_images.append(cropped)
 
-        # Guardar la imagen recortada
-        output_path = os.path.join(carpeta_salida, f"figura_filtrada_{i+1}.jpg")
-        os.makedirs(carpeta_salida, exist_ok=True)  # Crear directorio si no existe
+        # Save the cropped image
+        output_path = os.path.join(output_folder, f"filtered_shape_{i+1}.jpg")
+        os.makedirs(output_folder, exist_ok=True)  # Create directory if it doesn't exist
         cv2.imwrite(output_path, cropped)
 
-        # Dibujar un rectángulo alrededor del área recortada en la imagen original
+        # Draw a rectangle around the cropped area on the original image
         cv2.rectangle(imagep, (x_min, y_min), (x_max, y_max), (0, 255, 0), thickness=4)
 
-    return imagep, circulos, cropped_images, mask
+    return imagep, circles, cropped_images, mask
 
 ################################---------------##############################
+
 def recortar_circulo(image, clahe_clip=2.0, clahe_tile=16):
     """
-    Detecta y recorta el círculo de mayor radio en la imagen usando HoughCircles.
+    Detects and crops the largest circle in the image using HoughCircles.
     
     Parameters:
-    - image: Imagen de entrada en formato BGR.
-    - clahe_clip: Límite de contraste para CLAHE (default: 1.0).
-    - clahe_tile: Tamaño de la cuadrícula para CLAHE (default: 4).
+    - image: Input image in BGR format.
+    - clahe_clip: Contrast limit for CLAHE (default: 1.0).
+    - clahe_tile: Grid size for CLAHE (default: 4).
     
     Returns:
-    - output_image: Imagen original con el círculo detectado dibujado.
-    - centered_image: Imagen con el círculo recortado centrado en un fondo negro.
-    - radius: Radio del círculo detectado.
+    - output_image: Original image with the detected circle drawn.
+    - centered_image: Image with the cropped circle centered on a black background.
+    - radius: Radius of the detected circle.
     """
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     clahe = cv2.createCLAHE(clipLimit=clahe_clip, tileGridSize=(clahe_tile, clahe_tile))
@@ -232,75 +238,76 @@ def recortar_circulo(image, clahe_clip=2.0, clahe_tile=16):
         centered_image[y_offset:y_offset+h, x_offset:x_offset+w] = cropped_circle
         
         return centered_image, radius, new_cx, new_cy
-    # Si no se detectan círculos, devolver valores por defecto o None
+        
+    # If no circles are detected, return default or None values
     return None, 0, 0, 0
 
-def procesar_contornos_kmeans(image, threshold_value=100, area_min=100, area_max=5000, kernel_size=3, clahe_clip=1.0, clahe_tile=4, radio = 211, x =255, y =255):
+def  procesar_contornos_kmeans(image, threshold_value=100, area_min=100, area_max=5000, kernel_size=3, clahe_clip=1.0, clahe_tile=4, radius=211, x=255, y=255):
     """
-    Procesa la imagen para encontrar contornos, filtrarlos por área y aplicar K-Means a los centroides.
+    Processes the image to find contours, filter them by area, and apply K-Means to the centroids.
     
     Parameters:
-    - image: Imagen de entrada en formato BGR.
-    - threshold_value: Valor de umbral para binarización (default: 100).
-    - area_min: Área mínima para filtrar contornos (default: 100).
-    - area_max: Área máxima para filtrar contornos (default: 5000).
-    - kernel_size: Tamaño del kernel para operaciones morfológicas (default: 3).
-    - clahe_clip: Límite de contraste para CLAHE (default: 1.0).
-    - clahe_tile: Tamaño de la cuadrícula para CLAHE (default: 4).
+    - image: Input image in BGR format.
+    - threshold_value: Threshold value for binarization (default: 100).
+    - area_min: Minimum area to filter contours (default: 100).
+    - area_max: Maximum area to filter contours (default: 5000).
+    - kernel_size: Kernel size for morphological operations (default: 3).
+    - clahe_clip: Contrast limit for CLAHE (default: 1.0).
+    - clahe_tile: Grid size for CLAHE (default: 4).
     
     Returns:
-    - imagen_contornos: Imagen con todos los contornos dibujados.
-    - imagen_filtrada: Imagen con contornos filtrados por área.
-    - imagen_kmeans: Imagen con centroides agrupados por K-Means.
+    - contours_image: Image with all contours drawn.
+    - filtered_image: Image with contours filtered by area.
+    - kmeans_image: Image with centroids grouped by K-Means.
     """
-    # Obtener el tamaño de la imagen
-    alto, ancho = image.shape[:2]  # Extraer alto y ancho (ignora canales si los hay)
-    tamano_imagen = (ancho, alto)  # Devolver como (width, height)
+    # Get the size of the image
+    height, width = image.shape[:2]  # Extract height and width (ignore channels if any)
+    image_size = (width, height)  # Return as (width, height)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     clahe = cv2.createCLAHE(clipLimit=clahe_clip, tileGridSize=(clahe_tile, clahe_tile))
     img_clahe = clahe.apply(gray)
     
-    imagen_suavizada = cv2.GaussianBlur(img_clahe, (3, 3), 0)
-    imagen_bilateral = cv2.bilateralFilter(imagen_suavizada, 7, 7, 75)
-    _, binary = cv2.threshold(imagen_bilateral, threshold_value, 255, cv2.THRESH_BINARY_INV)
+    smoothed_image = cv2.GaussianBlur(img_clahe, (3, 3), 0)
+    bilateral_image = cv2.bilateralFilter(smoothed_image, 7, 7, 75)
+    _, binary = cv2.threshold(bilateral_image, threshold_value, 255, cv2.THRESH_BINARY_INV)
     
     kernel = np.ones((kernel_size, kernel_size), np.uint8)
     erosion = cv2.erode(binary, kernel, iterations=1)
-    bordes_cerrados = cv2.morphologyEx(erosion, cv2.MORPH_CLOSE, kernel)
-    bordes_limpios = cv2.morphologyEx(bordes_cerrados, cv2.MORPH_OPEN, kernel)
+    closed_edges = cv2.morphologyEx(erosion, cv2.MORPH_CLOSE, kernel)
+    clean_edges = cv2.morphologyEx(closed_edges, cv2.MORPH_OPEN, kernel)
     
-    contornos, _ = cv2.findContours(bordes_limpios, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    imagen_contornos = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-    cv2.drawContours(imagen_contornos, contornos, -1, (0, 255, 0), thickness=1)
+    contours, _ = cv2.findContours(clean_edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours_image = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+    cv2.drawContours(contours_image, contours, -1, (0, 255, 0), thickness=1)
     
-    imagen_filtrada = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-    centroides = []
-    for i, contorno in enumerate(contornos):
-        area = cv2.contourArea(contorno)
+    filtered_image = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+    centroids = []
+    for i, contour in enumerate(contours):
+        area = cv2.contourArea(contour)
         if area_min <= area <= area_max:
             color = tuple(np.random.randint(0, 255, 3).tolist())
-            cv2.drawContours(imagen_filtrada, [contorno], -1, color, thickness=1)
-            M = cv2.moments(contorno)
+            cv2.drawContours(filtered_image, [contour], -1, color, thickness=1)
+            M = cv2.moments(contour)
             if M["m00"] != 0:
                 cx = int(M["m10"] / M["m00"])
                 cy = int(M["m01"] / M["m00"])
-                centroides.append([cx, cy])
-                cv2.putText(imagen_filtrada, f"{i+1}", (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+                centroids.append([cx, cy])
+                cv2.putText(filtered_image, f"{i+1}", (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
     
-    imagen_kmeans = image.copy()
-    centros_kmeans = []
-    mascara = np.zeros_like(image, dtype=np.uint8)
-    #cv2.circle(mascara, (x, y), radio, (255, 255, 255), 2)  # Dibujar el círculo en la máscara
-    if len(centroides) > 1:
-        k = min(500, len(centroides))
+    kmeans_image = image.copy()
+    kmeans_centers = []
+    mask = np.zeros_like(image, dtype=np.uint8)
+    #cv2.circle(mask, (x, y), radius, (255, 255, 255), 2)  # Draw the circle on the mask
+    if len(centroids) > 1:
+        k = min(500, len(centroids))
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
-        _, labels, centers = cv2.kmeans(np.array(centroides, dtype=np.float32), k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
-        # Dibujar los centros detectados en la imagen
+        _, labels, centers = cv2.kmeans(np.array(centroids, dtype=np.float32), k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+        # Draw the detected centers on the image
         for center in centers:
             cx, cy = int(center[0]), int(center[1])
-            centros_kmeans.append([cx, cy])  # Guardar las coordenadas
-            cv2.circle(imagen_kmeans, (cx, cy), 5, (255, 255, 255), -1)
-            cv2.circle(mascara, (cx, cy), 5, (255, 255, 255), -1)
+            kmeans_centers.append([cx, cy])  # Save the coordinates
+            cv2.circle(kmeans_image, (cx, cy), 5, (255, 255, 255), -1)
+            cv2.circle(mask, (cx, cy), 5, (255, 255, 255), -1)
         
     
-    return imagen_kmeans, mascara, centros_kmeans, tamano_imagen, imagen_contornos, imagen_filtrada
+    return kmeans_image, mask, kmeans_centers, image_size, contours_image, filtered_image
