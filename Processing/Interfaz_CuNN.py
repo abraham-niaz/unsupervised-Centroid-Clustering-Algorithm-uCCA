@@ -177,7 +177,7 @@ class ImageProcessingApp:
         self.photo = ImageTk.PhotoImage(image=Image.fromarray(img_resized))
         self.canvas.delete("all")
         self.canvas.create_image(500, 150, image=self.photo)
-        self.scale = scale  # Actualizar escala actual
+        self.scale = scale  
 
     def update_image_scale(self, value):
         """Update the crop image."""
@@ -402,7 +402,7 @@ class ImageProcessingApp:
                 contours, _ = cv2.findContours(th1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             
                 # Step 7: Contour analysis
-                (image_areas, filtered_image, centroids) = analizar_contornos(imagen_gris, contours, area_min, area_max)
+                (image_areas, filtered_image, centroids) = analizar_contornos(gray_image, contours, area_min, area_max)
             
                 # Step 8: Circle filtering and cropping
                 (imagep, circles, cropped_images, mask) = filtrar_y_recortar_circulos(
