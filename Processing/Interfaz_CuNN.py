@@ -25,13 +25,13 @@ class ImageProcessingApp:
         self.original_image = None
         self.processed_image = None
         self.scale = 1.0
-        self.roi_rect = None  # ID del rectángulo en el canvas
-        self.roi_start = None  # Coordenadas iniciales del ROI
-        self.roi_coords = None  # Coordenadas actuales del ROI (x1, y1, x2, y2)
+        self.roi_rect = None  # ID of the rectangle on the canvas
+        self.roi_start = None  # Initial coordinates of the ROI
+        self.roi_coords = None  # Current coordinates of the ROI (x1, y1, x2, y2)
         
         # Create GUI elements
         self.create_widgets()
-        # Vincular el cambio de modo a una función
+        # Bind mode change to a function
         self.mode.trace('w', self.update_area_params)
 
     def create_widgets(self):
@@ -135,24 +135,24 @@ class ImageProcessingApp:
         self.status.pack(side=tk.BOTTOM, fill=tk.X)
         
     def update_area_params(self, *args):
-        """Actualiza los parámetros de área (valores y rangos) según el modo seleccionado"""
+        """Update area parameters (values and ranges) according to the selected mode"""
         current_mode = self.mode.get()
         
-        if current_mode == "procesar":
-            # Rangos y valores más bajos para el modo "procesar"
-            self.area_min.config(from_=0, to=500)    # Ejemplo: tope máximo de 5000
-            self.area_min.set(50)                     # Valor inicial más bajo
-            self.area_max.config(from_=0, to=5000)   # Ejemplo: tope máximo de 10000
-            self.area_max.set(2000)                   # Valor inicial más bajo
-        elif current_mode == "recortar":
-            # Rangos y valores originales para el modo "recortar"
-            self.area_min.config(from_=0, to=150000)  # Tope original
-            self.area_min.set(100)                    # Valor inicial original
-            self.area_max.config(from_=150000, to=300000)  # Tope original
-            self.area_max.set(5000)                   # Valor inicial original
+        if current_mode == "process":
+            ## Lower ranges and values for "process" mode
+            self.area_min.config(from_=0, to=500)    # Example: maximum limit of 5000
+            self.area_min.set(50)                     # Lower initial value
+            self.area_max.config(from_=0, to=5000)    
+            self.area_max.set(2000)                  
+        elif current_mode == "crop":
+            # Original ranges and values for "crop" mode
+            self.area_min.config(from_=0, to=150000)  # Original limit
+            self.area_min.set(100)                    # Original initial value
+            self.area_max.config(from_=150000, to=300000) 
+            self.area_max.set(5000)                   
 
     def update_scale_with_keys(self, event):
-        """Ajusta la escala con las teclas izquierda/derecha."""
+        """Adjust the scale with the left/right keys."""
         step = 0.05  # Incremento o decremento
         current_value = self.scale_var.get()
 
@@ -161,10 +161,10 @@ class ImageProcessingApp:
         elif event.keysym == "Right":
             new_value = min(self.scale_slider.cget("to"), current_value + step)
 
-        self.scale_var.set(new_value)  # Actualiza el slider 
+        self.scale_var.set(new_value)  #  Refresh slider 
         
     def display_image(self, img, scale=1.0):
-        """Actualiza la imagen mostrada"""
+        """Update the displayed image"""
         display_img = img.copy()
         if len(display_img.shape) == 2:
             display_img = cv2.cvtColor(display_img, cv2.COLOR_GRAY2RGB)
@@ -180,15 +180,15 @@ class ImageProcessingApp:
         self.scale = scale  # Actualizar escala actual
 
     def update_image_scale(self, value):
-        """Actualiza la imagen recortada """
+        """Update the crop image."""
         if self.original_image is not None:
             scale = self.scale_var.get()
             self.display_image(self.original_image, scale)
-            if self.roi_coords:  # Redibujar ROI si existe
+            if self.roi_coords:  # Redraw ROI if it exist
                 self.redraw_roi()
 
     def load_image(self):
-        """Carga la imagen"""
+        """Load image"""
         self.image_path = filedialog.askopenfilename(
             filetypes=[("Image files", "*.png *.jpg *.jpeg *.bmp")]
         )
@@ -200,16 +200,16 @@ class ImageProcessingApp:
                 return
             self.display_image(self.original_image)
             self.status.config(text=f"Loaded: {os.path.basename(self.image_path)}")
-            self.roi_coords = None  # Reiniciar ROI al cargar nueva imagen
+            self.roi_coords = None  # Reset ROI when loading a new image
             
     def update_roi(self, event):
-        """Actualiza el tamaño del ROI mientras se arrastra el mouse."""
+        """Update the size of the ROI while dragging the mouse."""
         if self.roi_start:
             self.canvas.coords(self.roi_rect, self.roi_start[0], self.roi_start[1], event.x, event.y)
 
 
     def start_roi(self, event):
-        """Inicia la selección del ROI al hacer clic."""
+        """Start ROI selection on click."""
         if self.original_image is None:
             return
         self.roi_start = (event.x, event.y)
@@ -219,13 +219,9 @@ class ImageProcessingApp:
             event.x, event.y, event.x, event.y, outline="red", width=2
         )
         
-    def update_roi(self, event):
-        """Actualiza el tamaño del ROI mientras se arrastra el mouse."""
-        if self.roi_start:
-            self.canvas.coords(self.roi_rect, self.roi_start[0], self.roi_start[1], event.x, event.y)
-            
+
     def finalize_roi(self, event):
-        """Finaliza la selección del ROI al soltar el mouse."""
+        """End ROI selection on mouse release."""
         if self.roi_start:
             self.roi_coords = (
                 min(self.roi_start[0], event.x),
@@ -237,7 +233,7 @@ class ImageProcessingApp:
             self.status.config(text=f"ROI selected: {self.roi_coords}")
 
     def redraw_roi(self):
-        """Redibuja el ROI al cambiar la escala de la imagen."""
+        """Redraw ROI to change image scale."""
         if self.roi_coords and self.roi_rect:
             self.canvas.delete(self.roi_rect)
             self.roi_rect = self.canvas.create_rectangle(
@@ -246,15 +242,16 @@ class ImageProcessingApp:
             )
 
     def crop_roi(self):
-        """Recorta la región seleccionada por el ROI y la muestra."""
+        """Crop the region selected by the ROI and display it."""
         if self.original_image is None or self.roi_coords is None:
             messagebox.showerror("Error", "Please load an image and select a ROI first")
             return
 
-        # Convertir coordenadas del canvas a coordenadas de la imagen original
+        # Convert canvas coordinates to original image coordinates
+
         h, w = self.original_image.shape[:2]
         canvas_w, canvas_h = int(w * self.scale), int(h * self.scale)
-        offset_x = (1000 - canvas_w) // 2  # Ajustar por centrado en el canvas
+        offset_x = (1000 - canvas_w) // 2  # Fit by centering on the canvas
         offset_y = 150 - canvas_h // 2
 
         x1 = int((self.roi_coords[0] - offset_x) / self.scale)
@@ -262,7 +259,7 @@ class ImageProcessingApp:
         x2 = int((self.roi_coords[2] - offset_x) / self.scale)
         y2 = int((self.roi_coords[3] - offset_y) / self.scale)
 
-        # Asegurarse de que las coordenadas estén dentro de los límites
+        # Make sure that the coordinates are within the boundaries
         x1, x2 = max(0, min(x1, w)), max(0, min(x2, w))
         y1, y2 = max(0, min(y1, h)), max(0, min(y2, h))
 
@@ -270,170 +267,180 @@ class ImageProcessingApp:
             messagebox.showerror("Error", "Invalid ROI dimensions")
             return
 
-        # Recortar la imagen
+        # Crop image
         cropped_image = self.original_image[y1:y2, x1:x2]
-        self.display_image(cropped_image, scale=1.0)  # Mostrar la imagen recortada
-        self.processed_image = cropped_image  # Guardar como imagen procesada
+        self.display_image(cropped_image, scale=1.0)  # Show crop image
+        self.processed_image = cropped_image  # Save as image process
         self.status.config(text=f"ROI cropped: ({x1}, {y1}, {x2}, {y2})")
 
     def process_image(self):
-        """Procesa la imagen según el modo seleccionado:
-            - 'procesar': Encuentra centroides de objetos circulares
-            - 'recortar': Extrae círculos de la imagen
-            """
+        """
+        Process the image according to the selected mode:
+            - 'process': Find centroids of circular objects
+            - 'crop': Extract circles from the image
+        """
     
-        # Validación inicial: Verifica si hay una imagen cargada
+        # Initial validation: Check if an image is loaded
         if self.original_image is None:
             messagebox.showerror("Error", "Please load an image first")
             return
 
         try:
             # =============================================
-            # 1. OBTENER PARÁMETROS DE LOS CONTROLES DE UI
+            # 1. GET PARAMETERS FROM UI CONTROLS
             # =============================================
-            area_min = self.area_min.get()          # Área mínima para detección
-            area_max = self.area_max.get()          # Área máxima para detección
-            threshold_mode = self.threshold_mode.get()  # Modo de threshold (otsu/manual)
-            manual_thresh = self.manual_threshold.get() # Valor de threshold manual
-            gaussian_k = self.gaussian_kernel.get()     # Tamaño del kernel gaussiano
-            bilateral_d = self.bilateral_d.get()        # Parámetro d para filtro bilateral
-            apply_erosion = self.apply_erosion.get()    # Bandera para aplicar erosión
-            apply_dilation = self.apply_dilation.get()  # Bandera para aplicar dilatación
-            morph_k = self.morph_kernel.get()           # Tamaño del kernel morfológico
-            clahe_clip = self.clahe_clip.get()          # Límite de clip para CLAHE
-            clahe_tile = self.clahe_tile.get()          # Tamaño de tile para CLAHE
+            
+            area_min = self.area_min.get()          # Minimum area for detection
+            area_max = self.area_max.get()          # Maximum area for detection
+            threshold_mode = self.threshold_mode.get()  # Threshold mode (otsu/manual)
+            manual_thresh = self.manual_threshold.get() # Manual threshold value
+            gaussian_k = self.gaussian_kernel.get()     # Gaussian kernel size
+            bilateral_d = self.bilateral_d.get()        # Parameter d for bilateral filter
+            apply_erosion = self.apply_erosion.get()    # Flag to apply erosion
+            apply_dilation = self.apply_dilation.get()  # Flag to apply dilation
+            morph_k = self.morph_kernel.get()           # Morphological kernel size
+            clahe_clip = self.clahe_clip.get()          # Clip limit for CLAHE
+            clahe_tile = self.clahe_tile.get()          # Tile size for CLAHE
 
-            # Actualizar estado en la interfaz
+
+            # Update status in the interface
             self.status.config(text="Processing image...")
-            self.root.update()  # Forzar actualización de la UI
+            self.root.update()  # Force UI update
         
             # =============================================
-            # 2. PROCESAMIENTO SEGÚN MODO SELECCIONADO
+            # 2. PROCESSING ACCORDING TO SELECTED MODE
             # =============================================
             mode = self.mode.get()
         
-            if mode == "procesar":
+            if mode == "process":
              # -----------------------------------------
-             # MODO: PROCESAR (DETECCIÓN DE CENTROIDES)
+             # MODO: PROCESS (CENTROID DETECTION)
              # -----------------------------------------
             
-                # Determinar valor de threshold según modo seleccionado
+                # Determine threshold value according to selected mode
                 threshold_value = manual_thresh if threshold_mode == "manual" else 100
             
-                # Paso 1: Detectar y centrar el círculo principal
+                # Step 1: Detect and center the main circle
                 centered_image, radius, new_cx, new_cy = recortar_circulo(self.original_image,clahe_clip=2.0, clahe_tile=16)
             
-                # Paso 2: Procesar contornos con K-Means
-                (imagen_kmeans, mascara, centros_kmeans, tamano_imagen, imagen_contornos, imagen_filtrada) = procesar_contornos_kmeans(
-                     self.original_image,
-                     clahe_clip=clahe_clip,
-                     clahe_tile=clahe_tile,
-                     threshold_value=threshold_value,
-                     area_min=area_min,
-                     area_max=area_max,
-                     kernel_size=morph_k,
-                     radio=radius,
-                     x=new_cx,
-                     y=new_cy
-                     )
+                # Step 2: Process contours with K-Means
+                (kmeans_image, mask, kmeans_centers, image_size, contour_image, filtered_image) = procesar_contornos_kmeans(
+                    self.original_image,
+                    clahe_clip=clahe_clip,
+                    clahe_tile=clahe_tile,
+                    threshold_value=threshold_value,
+                    area_min=area_min,
+                    area_max=area_max,
+                    kernel_size=morph_k,
+                    radius=radius,
+                    x=new_cx,
+                    y=new_cy
+                )
+
             
-                # Mostrar resultados
-                self.display_image(imagen_kmeans, scale=self.scale_var.get())
+                # Display results
+                self.display_image(kmeans_image, scale=self.scale_var.get())
             
-                # Almacenar resultados para posible guardado
-                self.processed_image = imagen_kmeans
-                self.processed_results = {
-                    'kmeans': imagen_kmeans,
-                    'mascara': mascara,
-                    'contornos': imagen_contornos,
-                    'filtrada': imagen_filtrada,
-                    'cx': new_cx,
-                    'cy': new_cy,
-                    'radio': radius,
-                    'centros_kmeans': centros_kmeans,
-                    'tamano_imagen': tamano_imagen
+                # Store results for possible saving
+
+                self.processed_image = kmeans_image
+                self.processed_results = {             
+                    'kmeans': kmeans_image,
+                    'mask': mask,
+                    'contours': contour_image,
+                    'filtered': filtered_image,
+                    'cx': new_cx,
+                    'cy': new_cy,
+                    'radius': radius,
+                    'kmeans_centers': kmeans_centers,
+                    'image_size': image_size
                     }
             
-                # Actualizar estado
-                status_text = f"Processing complete. {len(centros_kmeans)} centroides, tamaño: {tamano_imagen}"
-                self.status.config(text=status_text)
-            
-                # Debug: Mostrar información en consola
-                print("Centroides encontrados:", len(centros_kmeans))
-                print("Centroides K-Means:", centros_kmeans)
-                print("Tamaño de la imagen:", tamano_imagen)
+                
+                # Update status
+                status_text = f"Processing complete. {len(kmeans_centers)} centroids, size: {image_size}"
+                self.status.config(text=status_text)
+    
+                # Debug: Display information in console
+                print("Centroids found:", len(kmeans_centers))
+                print("K-Means Centroids:", kmeans_centers)
+                print("Image size:", image_size
 
-            elif mode == "recortar":
+
+            elif mode == "crop":
             # -----------------------------------------
-            # MODO: RECORTAR (EXTRACCIÓN DE CÍRCULOS)
+            # MODO: CROP (CIRCLE EXTRACTION)
             # -----------------------------------------
             
-                # Paso 1: Preprocesamiento de la imagen
-                imagen_gris = cv2.cvtColor(self.original_image, cv2.COLOR_BGR2GRAY)
-                blurred = cv2.GaussianBlur(imagen_gris, (gaussian_k, gaussian_k), 0)
+                # Step 1: Image preprocessing
+                gray_image = cv2.cvtColor(self.original_image, cv2.COLOR_BGR2GRAY)
+                blurred = cv2.GaussianBlur(gray_image, (gaussian_k, gaussian_k), 0)
             
-                # Paso 2: Mejora de contraste (CLAHE)
+                #Step 2: Contrast enhancement (CLAHE)
                 clahe = cv2.createCLAHE(clipLimit=clahe_clip, tileGridSize=(clahe_tile, clahe_tile))
                 img_clahe = clahe.apply(blurred)
             
-                # Paso 3: Filtrado bilateral (reduce ruido preservando bordes)
-                imagen_bilateral = cv2.bilateralFilter(img_clahe, bilateral_d, bilateral_d, 75)
+                # Step 3: Bilateral filtering (reduces noise while preserving edges
+                bilateral_image = cv2.bilateralFilter(img_clahe, bilateral_d, bilateral_d, 75)
 
-                # Paso 4: Thresholding (binarización)
+                # Step 4: Thresholding (binarization)
                 if threshold_mode == "otsu":
-                    _, th1 = cv2.threshold(imagen_bilateral, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+                    _, th1 = cv2.threshold(bilateral_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
                 else:
-                    _, th1 = cv2.threshold(imagen_bilateral, manual_thresh, 255, cv2.THRESH_BINARY)
+                    _, th1 = cv2.threshold(bilateral_image, manual_thresh, 255, cv2.THRESH_BINARY)
 
-                # Paso 5: Operaciones morfológicas
+                # Step 5: Morphological operations
+
                 kernel = np.ones((morph_k, morph_k), np.uint8)
                 if apply_erosion:
                     th1 = cv2.erode(th1, kernel, iterations=1)
                 if apply_dilation:
                     th1 = cv2.dilate(th1, kernel, iterations=1)
 
-                # Paso 6: Detección de contornos
+                # Step 6: Contour detection
+
                 contours, _ = cv2.findContours(th1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             
-                # Paso 7: Análisis de contornos
-                (imagen_areas, imagen_filtrada, centroides) = analizar_contornos(imagen_gris, contours, area_min, area_max)
+                # Step 7: Contour analysis
+                (image_areas, filtered_image, centroids) = analizar_contornos(imagen_gris, contours, area_min, area_max)
             
-                # Paso 8: Filtrado y recorte de círculos
-                (imagep, circulos, cropped_images, mask) = filtrar_y_recortar_circulos(
+                # Step 8: Circle filtering and cropping
+                (imagep, circles, cropped_images, mask) = filtrar_y_recortar_circulos(
                      self.original_image, 
                      contours, 
-                     centroides, 
+                     centroids, 
                      "output"
                      )
 
-                # Mostrar y almacenar resultados
+                # Display and store results
                 self.display_image(imagep, scale=self.scale_var.get())
                 self.processed_image = imagep
-                self.processed_results = {
-                    'areas': imagen_areas,
-                    'filtered': imagen_filtrada,
-                    'final': imagep,
-                    'circles': circulos,
-                    'mask': mask,
-                    'cropped': cropped_images
+                self.processed_results = {                
+                    'areas': image_areas,
+                    'filtered': filtered_image,
+                    'final': imagep,
+                    'circles': circles,
+                    'mask': mask,
+                    'cropped': cropped_images
                     }
                 self.status.config(text="Processing complete")
 
         except Exception as e:
-            # Manejo de errores
             error_msg = f"Processing failed: {str(e)}"
             messagebox.showerror("Error", error_msg)
             self.status.config(text="Error during processing")
             
             
     def save_results(self):
-        """Guarda los resultados del procesamiento de imágenes en un directorio seleccionado por el usuario.
-    
-    Los archivos guardados dependen del modo de operación:
-    - Modo 'recortar': Guarda imágenes recortadas de círculos detectados
-    - Modo 'procesar': Guarda imágenes intermedias y datos de centroides en JSON
+        """
+        Saves the image processing results in a directory selected by the user.
+
+        The saved files depend on the operation mode:
+        - 'crop' mode: Saves cropped images of detected circles
+        - 'process' mode: Saves intermediate images and centroid data in JSON
     """
-        # Verificar si hay resultados para guardar
+        # Check if there are results to save
+
         if not hasattr(self, 'processed_results'):
             messagebox.showerror("Error", "Please process an image first")
             return
@@ -441,44 +448,39 @@ class ImageProcessingApp:
         save_dir = filedialog.askdirectory()
         if save_dir:
             try:
-                # Guardar resultados del procesamiento si existen
+                # Save processing results if they exist
                 if hasattr(self, 'processed_results'):
-                    # MODO RECORTAR: Guardar imágenes de círculos recortados
+                    #CROP MODE: Save cropped circle images
                     if self.mode.get() == "recortar":
-                        #cv2.imwrite(os.path.join(save_dir, "areas_image.jpg"), self.processed_results['areas'])
-                        #cv2.imwrite(os.path.join(save_dir, "filtered_image.jpg"), self.processed_results['filtered'])
-                        #cv2.imwrite(os.path.join(save_dir, "final_image.jpg"), self.processed_results['final'])
-                        #cv2.imwrite(os.path.join(save_dir, "circles_image.jpg"), self.processed_results['circles'])
-                        #cv2.imwrite(os.path.join(save_dir, "mask_image.jpg"), self.processed_results['mask'])
-                                        
+     
                         for i, cropped_img in enumerate(self.processed_results['cropped'], 1):
                             output_path = os.path.join(save_dir, f"cropped_{i}.jpg")
                             cv2.imwrite(output_path, cropped_img)
                 
                     
                     else:
-                        # Guardar imágenes de cada etapa del procesamiento
+                        # Save images from each processing stage
                         cv2.imwrite(os.path.join(save_dir, "kmeans.jpg"), self.processed_results['kmeans'])
-                        cv2.imwrite(os.path.join(save_dir, "mascara.jpg"), self.processed_results['mascara'])
-                        cv2.imwrite(os.path.join(save_dir, "imagen_contornos.jpg"), self.processed_results['contornos'])
-                        cv2.imwrite(os.path.join(save_dir, "imagen_filtrada.jpg"), self.processed_results['filtrada'])
-                        # Guardar coordenadas y tamaño en JSON
+                        cv2.imwrite(os.path.join(save_dir, "mask.jpg"), self.processed_results['mask'])
+                        cv2.imwrite(os.path.join(save_dir, "contours_image.jpg"), self.processed_results['contours'])
+                        cv2.imwrite(os.path.join(save_dir, "filtered_image.jpg"), self.processed_results['filtered'])
+                        # Save coordinates and size in JSON
                         datos = {
-                            "centros_kmeans": [{"x": cx, "y": cy} for cx, cy in self.processed_results['centros_kmeans']],
-                            "tamano_imagen": {
-                                "ancho": self.processed_results['tamano_imagen'][0],
-                                "alto": self.processed_results['tamano_imagen'][1]
+                            "kmeans_centers": [{"x": cx, "y": cy} for cx, cy in self.processed_results['centros_kmeans']],
+                            "image_size": {
+                                "width": self.processed_results['image_size'][0],
+                                "height": self.processed_results['image_size'][1]
                                 },
-                            "centro_imagen": {
+                            "image_center": {
                                 "cx": self.processed_results['cx'],
                                 "cy": self.processed_results['cy']
                                 },
-                            "radio": self.processed_results['radio']
+                            "radius": self.processed_results['radius']
                             }
-                        with open(os.path.join(save_dir, "resultados.json"), "w") as f:
-                            json.dump(datos, f, indent=4)
+                        with open(os.path.join(save_dir, "results.json"), "w") as f:
+                            json.dump(data, f, indent=4)
                             
-                # Guardar el ROI recortado si existe
+                # the cropped ROI if it exists
                 if self.processed_image is not None and self.roi_coords is not None:
                     roi_path = os.path.join(save_dir, "roi_cropped.jpg")
                     cv2.imwrite(roi_path, self.processed_image)
