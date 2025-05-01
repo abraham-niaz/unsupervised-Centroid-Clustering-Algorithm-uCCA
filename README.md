@@ -1,6 +1,6 @@
-# UnsupervicedNNBiRonHart-CuNN
+# UnsupervicedNNBiRonHart-uCNN
 
-**UnsupervicedNNBiRonHart-CuNN**  is a project that combines image processing techniques and centroid analysis to study circular patterns in images in a semi-supervised manner. The project consists of two main components:
+**UnsupervicedNNBiRonHart-uCNN**  is a project that combines image processing techniques and centroid analysis to study circular patterns in images in a semi-supervised manner. The project consists of two main components:
 
 1. **Processing**: A graphical user interface (GUI) developed in Python that allows users to load images, select regions of interest (ROI), and automatically crop circles detected in those images. Subsequently, it obtains the centroids of the region of interest.
 2. **Circles**: An algorithm that calculates the difference between theoretical (expected) centroids and experimental centroids (obtained from the detected circles).
