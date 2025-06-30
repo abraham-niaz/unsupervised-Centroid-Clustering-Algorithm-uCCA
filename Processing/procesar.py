@@ -2,7 +2,6 @@
 """
 Created on Sun Mar  2 11:26:38 2025
 
-@author: Abraham
 """
 
 import cv2
