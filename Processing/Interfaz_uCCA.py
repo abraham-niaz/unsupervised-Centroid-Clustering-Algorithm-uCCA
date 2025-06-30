@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Mar 23 17:30:19 2025
-
-"""
 
 import tkinter as tk
 from tkinter import filedialog, messagebox
