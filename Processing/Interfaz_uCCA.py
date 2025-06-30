@@ -2,7 +2,6 @@
 """
 Created on Sun Mar 23 17:30:19 2025
 
-@author: Abraham
 """
 
 import tkinter as tk
