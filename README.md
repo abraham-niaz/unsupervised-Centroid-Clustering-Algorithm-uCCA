@@ -5,7 +5,46 @@
 1. **Processing**: A graphical user interface (GUI) developed in Python that allows users to load images, select regions of interest (ROI), and automatically crop circles detected in those images. Subsequently, it obtains the centroids of the region of interest.
 2. **Circles**: An algorithm that calculates the difference between theoretical (expected) centroids and experimental centroids (obtained from the detected circles).
 ---
-## Abstract
+
+## 📄 Descripción general
+
+El proyecto está dividido en tres módulos principales:
+
+### 1. `Interfaz_uCCA.py`
+Interfaz gráfica desarrollada con **Tkinter** que permite:
+- Cargar imágenes desde archivos locales.  
+- Aplicar filtros y ajustes de parámetros (CLAHE, umbralización, operaciones morfológicas, etc.).  
+- Seleccionar manualmente una **Región de Interés (ROI)**.  
+- Operar en dos modos:
+  - **Crop**: detección y recorte automático de regiones circulares.
+  - **Process**: análisis de contornos, cálculo de centroides y agrupamiento mediante **K-Means**.
+- Visualizar resultados directamente en un lienzo (canvas).
+- Exportar imágenes procesadas y datos en formato **JSON**.
+
+---
+
+### 2. `procesar.py`
+Contiene las funciones principales de **procesamiento digital**:
+- `analizar_contornos()`: identifica contornos, calcula áreas y centroides.  
+- `filtrar_y_recortar_circulos()`: selecciona regiones aproximadamente circulares y las recorta automáticamente.  
+- `recortar_circulo()`: detecta el círculo principal en la imagen usando la Transformada de Hough.  
+- `procesar_contornos_kmeans()`: aplica operaciones morfológicas, extrae contornos y agrupa los centroides con **K-Means**.
+
+Estas funciones son utilizadas por la interfaz principal (`Interfaz_uCCA.py`).
+
+---
+
+### 3. `Circulos.py`
+Realiza el **análisis comparativo entre centroides experimentales y teóricos**:
+- Carga los resultados experimentales desde un archivo JSON.  
+- Clasifica los centroides dentro o fuera de un círculo de referencia.  
+- Genera una **malla teórica** de puntos y los compara con los experimentales.  
+- Calcula errores en coordenadas y distancia euclidiana.  
+- Guarda los resultados en un archivo **CSV**.  
+- Visualiza los pares de puntos (teóricos vs. experimentales) con gráficos en **Matplotlib**.
+
+---
+-- ## Abstract
 
 We apply new Machine Learning (ML) technologies to optimize the Bi-Ronchi and Hartmann tests (BRT and HT, respectively), regarding the recognition, identification, and location of the centroids in experimental Bi-Ronchigrams and Hartmanngrams. We replace the conventional rigid Hartmann screen with structured apertures implemented via a Spatial Light Modulator (SLM) which enables the generation of multiple patterns with different aperture geometries. In the case of the Bi-Ronchi Mask (BRM) the geometry consists of square apertures in the BRT, whereas the Hartmann mask (HM) uses circular apertures in the HT. 
 
