@@ -1,4 +1,32 @@
-# -*- coding: utf-8 -*-
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#    This code constitutes an important tool for obtaining 
+#    the results in the manuscript entitled  "Machine Learning K−means 
+#    algorithm applied to wavefront sensing in Bi-Ronchi/Hartmann tests 
+#    with SLM", submitted to Optik de Elsevier.
+#
+#    Correspondings Authors:
+#    Dr. Jesus Alonso Arriaga Hernandez
+#    jesus.arriagahdz@correo.buap.mx;    dr.j.a.arriaga.hernandez@gmail.com
+#    
+#    Dra. Bolivia Teresa Cuevas Otahola
+#    b.cuevas@irya.unam.mx;                      b.cuevas.otahola@gmail.com
+#
+#    Lic. Abraham Gilberto Díaz Nayotl
+#    dn223470444@alm.buap.mx;                        gil.diaz1205@gmail.com
+#
+#
+#    This code performs a comparative analysis between experimental and 
+#    theoretical centroids in an image. It first loads the experimental 
+#    data from a JSON file, extracts the centroids, and classifies which
+#    ones are inside or outside a circle of a defined radius. Then, it 
+#    generates a grid of theoretical points distributed uniformly, classifying 
+#    them in the same way. Next, each experimental point is paired with its 
+#    closest theoretical point by calculating Euclidean distances, computing 
+#    coordinate and distance errors, and storing the results in a CSV file. 
+#    Finally, the program visualizes and compares both sets of points (experimental 
+#    and theoretical), drawing lines that represent the errors between them 
+#    and displaying the average difference.
+
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
@@ -269,7 +297,5 @@ plt.title("Comparison of Experimental vs. Theoretical Centroids")
 plt.legend()
 plt.grid(True, linestyle='--', alpha=0.7)
 plt.axis('off')
-#plt.gca().set_aspect('equal', adjustable='box')  # Equal scale in X and Y
-
-# Show the graph
 plt.show()
+
