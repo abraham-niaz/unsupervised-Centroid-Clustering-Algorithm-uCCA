@@ -12,7 +12,8 @@ We apply new Machine Learning (ML) technologies to optimize the Bi-Ronchi and Ha
 We designed an experimental setup based on an SLM with a laser illumination system and implemented an unsupervised Centroid Neural Network (uCNN), based on the Machine Learning algorithm $K-$ Means, to identify the geometries of the centroids followed by their segmentation and localization by clustering. We compare the experimental and theoretical Bi-Ronchigrams (or Hartmanngrams) to obtain a Point Cloud of transverse aberrations ($TA$), denoted as $PC_{TA}$. We apply the Point Cloud Method (PCM) to obtain an integrable surface from the points in $PC_{TA}$. 
 
 Finally, we replace the numerical integration of ${PC_{TA}} {\to} {TA}$ with a directional derivative approach based on the Eikonal equation, solved using gaussian quadrature to obtain the wavefront. We compare our results with the Zernike aberration polynomials for sensing optical elements from the aberrations of the system by means of the aberrations of its Wavefront ${\mathcal{W}} ({\rho}, {\theta})$.
---
+
+---
 
 📄 English Instructions
 The project is divided into three main modules:
@@ -81,6 +82,7 @@ Se aplicamron nuevas tecnologías de Aprendizaje Automático (Machine Learning, 
 Diseñamos un montaje experimental basado en un SLM con un sistema de iluminación láser e implementamos una Red Neuronal de Centroides no Supervisada (uCNN), basada en el algoritmo de Aprendizaje Automático $K-$ Means, para identificar las geometrías de los centroides, seguida de su segmentación y localización mediante agrupamiento (clustering). Comparamos los Bi-Ronchigramas (o Hartmanngramas) experimentales y teóricos para obtener una Nube de Puntos de Aberraciones Transversales ($TA$), denotada como $PC_{TA}$. Aplicamos el Método de Nube de Puntos (PCM) para obtener una superficie integrable a partir de los puntos en $PC_{TA}$.
 
 Finalmente, reemplazamos la integración numérica de ${PC_{TA}} \to {TA}$ por un enfoque de derivadas direccionales basado en la ecuación de Eikonal, resuelta mediante cuadratura gaussiana para obtener el frente de onda. Comparamos nuestros resultados con los polinomios de aberración de Zernike para analizar elementos ópticos a partir de las aberraciones del sistema mediante las aberraciones de su Frente de Onda ${\mathcal{W}} ({\rho}, {\theta})$.
+
 ---
 ## 📄 Instrucciones en Español
 
