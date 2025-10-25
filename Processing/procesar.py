@@ -1,4 +1,19 @@
-# -*- coding: utf-8 -*-
+#    This set of functions implements the process defined in the file 
+#    "Interfaz_uCCA.py" for filtering and contour segmentation in images. 
+#    The function analizar_contornos() identifies the contours present, 
+#    calculates their areas and centroids, and filters those within a 
+#    specific range, displaying visual results and data for each contour. 
+#    filtrar_y_recortar_circulos() selects contours that are approximately 
+#    circular, calculates their average radius, and automatically crops 
+#    the corresponding regions, saving the cropped images. The function 
+#    recortar_circulo() detects the largest circle in the image using the 
+#    Hough Transform, crops it, and centers it for further analysis. 
+#    Finally, procesar_contornos_kmeans() applies morphological operations, 
+#    extracts contours filtered by area, calculates their centroids, and 
+#    groups them using the K-Means algorithm, generating output images 
+#    that show the results of processing, segmentation, and clustering of 
+#    relevant points within the image.
+
 import cv2
 import numpy as np
 import os
@@ -305,3 +320,4 @@ def  procesar_contornos_kmeans(image, threshold_value=100, area_min=100, area_ma
         
     
     return kmeans_image, mask, kmeans_centers, image_size, contours_image, filtered_image
+
