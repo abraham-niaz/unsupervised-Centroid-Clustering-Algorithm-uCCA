@@ -1,4 +1,36 @@
-# -*- coding: utf-8 -*-
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#    This code constitutes an important tool for obtaining the results in
+#    the manuscript entitled  "Machine Learning K−means algorithm applied to
+#    wavefront sensing in Bi-Ronchi/Hartmann tests with SLM", submitted to 
+#    Optik de Elsevier.
+#
+#    Correspondings Authors:
+#    Dr. Jesus Alonso Arriaga Hernandez
+#    jesus.arriagahdz@correo.buap.mx;    dr.j.a.arriaga.hernandez@gmail.com
+#    
+#    Dra. Bolivia Teresa Cuevas Otahola
+#    b.cuevas@irya.unam.mx;                      b.cuevas.otahola@gmail.com
+#
+#    Lic. Abraham Gilberto Díaz Nayotl
+#    dn223470444@alm.buap.mx;                        gil.diaz1205@gmail.com
+#
+#    This program implements a graphical interface using Tkinter to load, 
+#    visualize, process, and save images through digital image processing 
+#    techniques. It allows the user to adjust parameters (such as thresholds, 
+#    filters, morphological operations, and contrast enhancement), select a 
+#    region of interest (ROI) directly on the image, and choose between two 
+#    operation modes: “crop,” which detects and extracts circular regions 
+#    from the image (saving each crop individually), and “process,” which 
+#    analyzes contours and calculates centroids using K-Means. Additionally, 
+#    it enables visualization of the processed results on a canvas and 
+#    displays the generated data (such as coordinates and radii) in JSON format.
+#
+#    In this work, a system was developed with the purpose of obtaining the 
+#    centroids of the objects present in the images, in order to compare the 
+#    actual coordinates obtained from photographs with the previously defined 
+#    ideal coordinates. Once the centroids are determined, a table is generated 
+#    that allows calculating and analyzing the distances between the ideal points
+#    and the actual points.
 
 import tkinter as tk
 from tkinter import filedialog, messagebox
@@ -494,3 +526,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
