@@ -5,45 +5,6 @@
 1. **Processing**: A graphical user interface (GUI) developed in Python that allows users to load images, select regions of interest (ROI), and automatically crop circles detected in those images. Subsequently, it obtains the centroids of the region of interest.
 2. **Circles**: An algorithm that calculates the difference between theoretical (expected) centroids and experimental centroids (obtained from the detected circles).
 ---
-
-## 📄 Descripción general
-
-El proyecto está dividido en tres módulos principales:
-
-### 1. `Interfaz_uCCA.py`
-Interfaz gráfica desarrollada con **Tkinter** que permite:
-- Cargar imágenes desde archivos locales.  
-- Aplicar filtros y ajustes de parámetros (CLAHE, umbralización, operaciones morfológicas, etc.).  
-- Seleccionar manualmente una **Región de Interés (ROI)**.  
-- Operar en dos modos:
-  - **Crop**: detección y recorte automático de regiones circulares.
-  - **Process**: análisis de contornos, cálculo de centroides y agrupamiento mediante **K-Means**.
-- Visualizar resultados directamente en un lienzo (canvas).
-- Exportar imágenes procesadas y datos en formato **JSON**.
-
----
-
-### 2. `procesar.py`
-Contiene las funciones principales de **procesamiento digital**:
-- `analizar_contornos()`: identifica contornos, calcula áreas y centroides.  
-- `filtrar_y_recortar_circulos()`: selecciona regiones aproximadamente circulares y las recorta automáticamente.  
-- `recortar_circulo()`: detecta el círculo principal en la imagen usando la Transformada de Hough.  
-- `procesar_contornos_kmeans()`: aplica operaciones morfológicas, extrae contornos y agrupa los centroides con **K-Means**.
-
-Estas funciones son utilizadas por la interfaz principal (`Interfaz_uCCA.py`).
-
----
-
-### 3. `Circulos.py`
-Realiza el **análisis comparativo entre centroides experimentales y teóricos**:
-- Carga los resultados experimentales desde un archivo JSON.  
-- Clasifica los centroides dentro o fuera de un círculo de referencia.  
-- Genera una **malla teórica** de puntos y los compara con los experimentales.  
-- Calcula errores en coordenadas y distancia euclidiana.  
-- Guarda los resultados en un archivo **CSV**.  
-- Visualiza los pares de puntos (teóricos vs. experimentales) con gráficos en **Matplotlib**.
-
----
 -- ## Abstract
 
 We apply new Machine Learning (ML) technologies to optimize the Bi-Ronchi and Hartmann tests (BRT and HT, respectively), regarding the recognition, identification, and location of the centroids in experimental Bi-Ronchigrams and Hartmanngrams. We replace the conventional rigid Hartmann screen with structured apertures implemented via a Spatial Light Modulator (SLM) which enables the generation of multiple patterns with different aperture geometries. In the case of the Bi-Ronchi Mask (BRM) the geometry consists of square apertures in the BRT, whereas the Hartmann mask (HM) uses circular apertures in the HT. 
@@ -51,14 +12,45 @@ We apply new Machine Learning (ML) technologies to optimize the Bi-Ronchi and Ha
 We designed an experimental setup based on an SLM with a laser illumination system and implemented an unsupervised Centroid Neural Network (uCNN), based on the Machine Learning algorithm $K-$ Means, to identify the geometries of the centroids followed by their segmentation and localization by clustering. We compare the experimental and theoretical Bi-Ronchigrams (or Hartmanngrams) to obtain a Point Cloud of transverse aberrations ($TA$), denoted as $PC_{TA}$. We apply the Point Cloud Method (PCM) to obtain an integrable surface from the points in $PC_{TA}$. 
 
 Finally, we replace the numerical integration of ${PC_{TA}} {\to} {TA}$ with a directional derivative approach based on the Eikonal equation, solved using gaussian quadrature to obtain the wavefront. We compare our results with the Zernike aberration polynomials for sensing optical elements from the aberrations of the system by means of the aberrations of its Wavefront ${\mathcal{W}} ({\rho}, {\theta})$.
+--
 
-## Resumen
+📄 English Instructions
+The project is divided into three main modules:
 
-Se aplicamron nuevas tecnologías de Aprendizaje Automático (Machine Learning, ML) para optimizar las pruebas de Bi-Ronchi y Hartmann (BRT y HT, respectivamente), en lo que respecta al reconocimiento, identificación y localización de los centroides en Bi-Ronchigramas y Hartmanngramas experimentales. Reemplazamos la pantalla rígida convencional de Hartmann por aperturas estructuradas implementadas mediante un Modulador Espacial de Luz (SLM), lo que permite la generación de múltiples patrones con diferentes geometrías de apertura. En el caso de la Máscara Bi-Ronchi (BRM), la geometría consiste en aperturas cuadradas en la BRT, mientras que la máscara de Hartmann (HM) utiliza aperturas circulares en la HT.
+### 1. `Interfaz_uCCA.py`
+A graphical interface developed with **Tkinter** that allows:
 
-Diseñamos un montaje experimental basado en un SLM con un sistema de iluminación láser e implementamos una Red Neuronal de Centroides no Supervisada (uCNN), basada en el algoritmo de Aprendizaje Automático $K-$ Means, para identificar las geometrías de los centroides, seguida de su segmentación y localización mediante agrupamiento (clustering). Comparamos los Bi-Ronchigramas (o Hartmanngramas) experimentales y teóricos para obtener una Nube de Puntos de Aberraciones Transversales ($TA$), denotada como $PC_{TA}$. Aplicamos el Método de Nube de Puntos (PCM) para obtener una superficie integrable a partir de los puntos en $PC_{TA}$.
+-Loading images from local files.
+-Applying filters and parameter adjustments (CLAHE, thresholding, morphological operations, etc.).
+-Manually selecting a **Region of Interest (ROI)**.
+-Operating in two modes:
+  -**Crop**: automatic detection and cropping of circular regions.
+  -**Process**: contour analysis, centroid calculation, and clustering using **K-Means**.
+-Visualizing results directly on a canvas.
+-Exporting processed images and data in **JSON format**.
 
-Finalmente, reemplazamos la integración numérica de ${PC_{TA}} \to {TA}$ por un enfoque de derivadas direccionales basado en la ecuación de Eikonal, resuelta mediante cuadratura gaussiana para obtener el frente de onda. Comparamos nuestros resultados con los polinomios de aberración de Zernike para analizar elementos ópticos a partir de las aberraciones del sistema mediante las aberraciones de su Frente de Onda ${\mathcal{W}} ({\rho}, {\theta})$.
+
+### 2. `procesar.py`
+Contains the main **image processing functions**:
+  -analizar_contornos(): identifies contours, calculates areas and centroids.
+  -filtrar_y_recortar_circulos(): selects approximately circular regions and automatically crops them.
+  -recortar_circulo(): detects the main circle in the image using the Hough Transform.
+  -procesar_contornos_kmeans(): applies morphological operations, extracts contours, and clusters centroids with **K-Means**.
+
+These functions are used by the main interface (Interfaz_uCCA.py).
+
+### 3. `Circulos.py`
+Performs **comparative analysis between experimental and theoretical centroids**:
+
+Loads experimental results from a JSON file.
+Classifies centroids as inside or outside a reference circle.
+Generates a **theoretical grid of points** and compares them with experimental ones.
+Calculates errors in coordinates and Euclidean distance.
+Saves results in a **CSV file**.
+Visualizes paired points (theoretical vs. experimental) with **Matplotlib** plots.
+
+---
+
 
 ## Features
 - **Intuitive graphical interface**: Load and crop circles of interest in images with a Tkinter-based interface.
@@ -81,5 +73,64 @@ Finalmente, reemplazamos la integración numérica de ${PC_{TA}} \to {TA}$ por u
   - `matplotlib`
   - `csv`
   - `json`
+---
+## Resumen
 
+Se aplicamron nuevas tecnologías de Aprendizaje Automático (Machine Learning, ML) para optimizar las pruebas de Bi-Ronchi y Hartmann (BRT y HT, respectivamente), en lo que respecta al reconocimiento, identificación y localización de los centroides en Bi-Ronchigramas y Hartmanngramas experimentales. Reemplazamos la pantalla rígida convencional de Hartmann por aperturas estructuradas implementadas mediante un Modulador Espacial de Luz (SLM), lo que permite la generación de múltiples patrones con diferentes geometrías de apertura. En el caso de la Máscara Bi-Ronchi (BRM), la geometría consiste en aperturas cuadradas en la BRT, mientras que la máscara de Hartmann (HM) utiliza aperturas circulares en la HT.
+
+Diseñamos un montaje experimental basado en un SLM con un sistema de iluminación láser e implementamos una Red Neuronal de Centroides no Supervisada (uCNN), basada en el algoritmo de Aprendizaje Automático $K-$ Means, para identificar las geometrías de los centroides, seguida de su segmentación y localización mediante agrupamiento (clustering). Comparamos los Bi-Ronchigramas (o Hartmanngramas) experimentales y teóricos para obtener una Nube de Puntos de Aberraciones Transversales ($TA$), denotada como $PC_{TA}$. Aplicamos el Método de Nube de Puntos (PCM) para obtener una superficie integrable a partir de los puntos en $PC_{TA}$.
+
+Finalmente, reemplazamos la integración numérica de ${PC_{TA}} \to {TA}$ por un enfoque de derivadas direccionales basado en la ecuación de Eikonal, resuelta mediante cuadratura gaussiana para obtener el frente de onda. Comparamos nuestros resultados con los polinomios de aberración de Zernike para analizar elementos ópticos a partir de las aberraciones del sistema mediante las aberraciones de su Frente de Onda ${\mathcal{W}} ({\rho}, {\theta})$.
+---
+## 📄 Instrucciones en Español
+
+El proyecto está dividido en tres módulos principales:
+
+### 1. `Interfaz_uCCA.py`
+Interfaz gráfica desarrollada con **Tkinter** que permite:
+- Cargar imágenes desde archivos locales.  
+- Aplicar filtros y ajustes de parámetros (CLAHE, umbralización, operaciones morfológicas, etc.).  
+- Seleccionar manualmente una **Región de Interés (ROI)**.  
+- Operar en dos modos:
+  - **Crop**: detección y recorte automático de regiones circulares.
+  - **Process**: análisis de contornos, cálculo de centroides y agrupamiento mediante **K-Means**.
+- Visualizar resultados directamente en un lienzo (canvas).
+- Exportar imágenes procesadas y datos en formato **JSON**.
+
+---
+
+### 2. `procesar.py`
+Contiene las funciones de **procesamiento digital**:
+- `analizar_contornos()`: identifica contornos, calcula áreas y centroides.  
+- `filtrar_y_recortar_circulos()`: selecciona regiones aproximadamente circulares y las recorta automáticamente.  
+- `recortar_circulo()`: detecta el círculo principal en la imagen usando la Transformada de Hough.  
+- `procesar_contornos_kmeans()`: aplica operaciones morfológicas, extrae contornos y agrupa los centroides con **K-Means**.
+
+Estas funciones son utilizadas por la interfaz principal (`Interfaz_uCCA.py`).
+
+---
+
+### 3. `Circulos.py`
+Realiza el **análisis comparativo entre centroides experimentales y teóricos**:
+- Carga los resultados experimentales desde un archivo JSON.  
+- Clasifica los centroides dentro o fuera de un círculo de referencia.  
+- Genera una **malla teórica** de puntos y los compara con los experimentales.  
+- Calcula errores en coordenadas y distancia euclidiana.  
+- Guarda los resultados en un archivo **CSV**.  
+- Visualiza los pares de puntos (teóricos vs. experimentales) con gráficos en **Matplotlib**.
+
+---
+## Requisitos
+- Python 3.12
+- Libraries:
+  - `opencv-python` 
+  - `tkinter`
+  - `Pillow` 
+  - `numpy`
+  - `os`
+  - `numpy`
+  - `matplotlib`
+  - `csv`
+  - `json`
+---
 
