@@ -1,3 +1,20 @@
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#    This code are funtions to constitutes an important tool for obtaining 
+#    the results in the manuscript entitled  "Machine Learning K−means 
+#    algorithm applied to wavefront sensing in Bi-Ronchi/Hartmann tests 
+#    with SLM", submitted to Optik de Elsevier.
+#
+#    Correspondings Authors:
+#    Dr. Jesus Alonso Arriaga Hernandez
+#    jesus.arriagahdz@correo.buap.mx;    dr.j.a.arriaga.hernandez@gmail.com
+#    
+#    Dra. Bolivia Teresa Cuevas Otahola
+#    b.cuevas@irya.unam.mx;                      b.cuevas.otahola@gmail.com
+#
+#    Lic. Abraham Gilberto Díaz Nayotl
+#    dn223470444@alm.buap.mx;                        gil.diaz1205@gmail.com
+#
+#
 #    This set of functions implements the process defined in the file 
 #    "Interfaz_uCCA.py" for filtering and contour segmentation in images. 
 #    The function analizar_contornos() identifies the contours present, 
@@ -197,8 +214,6 @@ def filtrar_y_recortar_circulos(image, contours, centroids, output_folder, toler
 
     return imagep, circles, cropped_images, mask
 
-################################---------------##############################
-
 def recortar_circulo(image, clahe_clip=2.0, clahe_tile=16):
     """
     Detects and crops the largest circle in the image using HoughCircles.
@@ -320,4 +335,5 @@ def  procesar_contornos_kmeans(image, threshold_value=100, area_min=100, area_ma
         
     
     return kmeans_image, mask, kmeans_centers, image_size, contours_image, filtered_image
+
 
