@@ -16,6 +16,7 @@ Finally, we replace the numerical integration of ${PC_{TA}} {\to} {TA}$ with a d
 ---
 
 📄 English Instructions
+
 The project is divided into three main modules:
 
 ### 1. `Interfaz_uCCA.py`
