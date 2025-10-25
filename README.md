@@ -5,7 +5,7 @@
 1. **Processing**: A graphical user interface (GUI) developed in Python that allows users to load images, select regions of interest (ROI), and automatically crop circles detected in those images. Subsequently, it obtains the centroids of the region of interest.
 2. **Circles**: An algorithm that calculates the difference between theoretical (expected) centroids and experimental centroids (obtained from the detected circles).
 ---
--- ## Abstract
+## Abstract
 
 We apply new Machine Learning (ML) technologies to optimize the Bi-Ronchi and Hartmann tests (BRT and HT, respectively), regarding the recognition, identification, and location of the centroids in experimental Bi-Ronchigrams and Hartmanngrams. We replace the conventional rigid Hartmann screen with structured apertures implemented via a Spatial Light Modulator (SLM) which enables the generation of multiple patterns with different aperture geometries. In the case of the Bi-Ronchi Mask (BRM) the geometry consists of square apertures in the BRT, whereas the Hartmann mask (HM) uses circular apertures in the HT. 
 
